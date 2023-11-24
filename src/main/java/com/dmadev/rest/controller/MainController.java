@@ -10,6 +10,7 @@ import com.dmadev.rest.exception.CatNotFoundException;
 import com.dmadev.rest.repository.CatRepo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -27,10 +28,14 @@ import java.util.List;
 public class MainController {
 
     //    @Autowired
-//@RequiredArgsConstructor + final - автоматическое внедрение
+    //@RequiredArgsConstructor + final - автоматическое внедрение
     private final CatRepo catRepo;
     private final ObjectMapper objectMapper;
 
+    @Operation(
+            summary = "Post new cat in database",
+            description = "get DTO cat and builder catch and save entity in db"
+    )
     @PostMapping("/api/add")
     public void addCat(@RequestBody CatDTO catDTO) {
         //при конкатенации автоматически работает метод toString
