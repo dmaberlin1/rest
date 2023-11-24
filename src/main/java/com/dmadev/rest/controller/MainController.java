@@ -1,56 +1,49 @@
-package com.dmadev.rest.controller;
-
-/*
- *для того чтобы спринг воспринимал этот класс как класс обработчик htpp запросов,мы должны его пометить аннотацией rest контроллер
- */
-
 import com.dmadev.rest.DTO.CatDTO;
 import com.dmadev.rest.entity.Cat;
 import com.dmadev.rest.exception.CatNotFoundException;
 import com.dmadev.rest.repository.CatRepo;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name="main_methods")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@Tag(name="main_methods", description = "Main API methods")
 public class MainController {
 
-    //    @Autowired
-    //@RequiredArgsConstructor + final - автоматическое внедрение
     private final CatRepo catRepo;
     private final ObjectMapper objectMapper;
 
     @Operation(
             summary = "Post new cat in database",
-            description = "get DTO cat and builder catch and save entity in db"
+            description = "Add a new cat to the database using the provided CatDTO."
     )
     @PostMapping("/api/add")
     public void addCat(@RequestBody CatDTO catDTO) {
-        //при конкатенации автоматически работает метод toString
-        log.info(
-                "New row: " + catRepo.save(
-                        Cat.builder()
-                                .age(catDTO.getAge())
-                                .name(catDTO.getName())
-                                .weight(catDTO.getWeight())
-                                .build()));
+        log.info("New row: " + catRepo.save(
+                Cat.builder()
+                        .age(catDTO.getAge())
+                        .name(catDTO.getName())
+                        .weight(catDTO.getWeight())
+                        .build()));
     }
 
-// @SneakyThrows -заставляет исключение  пробрасыватся- без его обработки
-
     @SneakyThrows
+    @Operation(
+            summary = "Get all cats",
+            description = "Retrieve a list of all cats from the database."
+    )
     @GetMapping("/api/all")
     public String getAll() throws CatNotFoundException {
         List<Cat> cats = catRepo.findAll();
@@ -62,16 +55,28 @@ public class MainController {
     }
 
     @SneakyThrows
+    @Operation(
+            summary = "Get all cats",
+            description = "Retrieve a list of all cats from the database."
+    )
     @GetMapping("/api/allCats")
     public List<Cat> getAllCats() throws CatNotFoundException {
         return catRepo.findAll();
     }
 
+    @Operation(
+            summary = "Get a specific cat by ID",
+            description = "Retrieve a specific cat from the database using its ID."
+    )
     @GetMapping("/api")
     public Cat getCat(@RequestParam long id) {
         return catRepo.findById(id).orElseThrow();
     }
 
+    @Operation(
+            summary = "Delete a cat by ID",
+            description = "Delete a cat from the database using its ID."
+    )
     @DeleteMapping("/api")
     public void deleteCat(@RequestParam long id) throws CatNotFoundException {
         if (!catRepo.existsById(id)) {
@@ -81,6 +86,10 @@ public class MainController {
     }
 
     @SneakyThrows
+    @Operation(
+            summary = "Update a cat",
+            description = "Update an existing cat in the database."
+    )
     @PutMapping("/api/put")
     public String changeCat(@RequestBody Cat cat) {
         if (!catRepo.existsById(cat.getId())) {
@@ -88,9 +97,5 @@ public class MainController {
         }
 
         return catRepo.save(cat).toString();
-
-
     }
-
-
 }
